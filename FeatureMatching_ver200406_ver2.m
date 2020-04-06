@@ -1,4 +1,5 @@
-LF = SetParams();
+% LF = SetParams();
+LF = SetParams_server();
 %% Run (w blending)
 [posx, posy] = meshgrid(-24:12:24, -24:12:24);
 posx = posx(:);
