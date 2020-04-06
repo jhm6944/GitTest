@@ -111,8 +111,9 @@ for x=1:size(disparity, 2)
         
         features_temp = cat(1, features_temp, [w_near, h_n, w_far, h, cost(y, x)]);
     end
-    [C,ia,ic] = unique(features_temp(:, 1:2), 'rows');
-    features = cat(1, features, features_temp(ia, :));
+%     [C,ia,ic] = unique(features_temp(:, 1:2), 'rows');
+%     features = cat(1, features, features_temp(ia, :));
+    features = cat(1, features, features_temp);
 end
 
 view_near = padarray(view_near, [25, 25], 0, 'both');
