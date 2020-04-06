@@ -11,7 +11,8 @@ posy = posy(:);
     curr_posy = 0;
     posx_front = curr_posx;            posy_front = curr_posy;
 
-    morph_image = renderingLF_morph(LF{1, 1}, LF{2, 1}, posx_front, posy_front);
+%     morph_image = renderingLF_morph(LF{1, 1}, LF{2, 1}, posx_front, posy_front);
+    morph_image = renderingLF_morph_load(LF{1, 1}, LF{2, 1}, posx_front, posy_front);
     imshow(morph_image);
 % end
 
