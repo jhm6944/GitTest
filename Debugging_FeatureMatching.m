@@ -1,4 +1,6 @@
 %% DEBUG FEATURES
+global PARAMS;
+
 load('disparity');
 height = PARAMS.HEIGHT/4;
 width = PARAMS.WIDTH/4;
