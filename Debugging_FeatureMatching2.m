@@ -112,6 +112,7 @@ for i=1:size(features, 1)
     view_near_sub = view_near((h_n-20):(h_n+20), (w_n-20):(w_n+20), :);
     view_far_sub = view_far((h_f-20):(h_f+20), (w_f-20):(w_f+20), :);
     
+    disp([num2str(w_n) ', ' num2str(h_n) ', ' num2str(w_f) ', ' num2str(h_f) ]);
     subplot(1, 2, 1);
     imshow(view_near_sub);
     subplot(1, 2, 2);
