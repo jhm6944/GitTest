@@ -70,6 +70,8 @@ view_far = cat(1, rot90(VIEW_BACK_FAR(1:size(VIEW_BACK_FAR, 1)/2, :, :), 2), ...
 % view_far(:, 1:PARAMS.RESIZE_WIDTH/8, :) = VIEW_BACK_FAR(:, (size(VIEW_BACK_FAR, 2)/2 + 1):size(VIEW_BACK_FAR, 2), :);
 % view_far(:, (PARAMS.RESIZE_WIDTH - PARAMS.RESIZE_WIDTH/8 + 1):PARAMS.RESIZE_WIDTH, :) = VIEW_BACK_FAR(:, 1:size(VIEW_BACK_FAR, 2)/2, :);
 
+height = PARAMS.HEIGHT/4;
+width = PARAMS.WIDTH/4;
 h_t = ((height*2)-1) / floor(height*2/10);
 hh = 1:h_t:(height*2);
 w_t = (OUT_W-1) / floor(OUT_W/10);
