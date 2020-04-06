@@ -68,7 +68,7 @@ function MORPHED_IMAGE = renderingLF_morph(LF_A0, LF_A1, POS_X, POS_Y)%, Matched
             w_n = round(w) + windowsize/2;
             h_n = round(h) + windowsize/2;
             
-           im_near_sub = im_near((h_n-windowsize/2):(h_n+windowsize/2), (w_n-windowsize/2):(w_n+windowsize/2));
+           im_near_sub = im_near((h_n-windowsize/2):(h_n+25), (w_n-25):(w_n+25));
            im_near_subs(:, :, idx_h) = im_near_sub;
         end
        

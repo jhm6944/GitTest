@@ -1,4 +1,4 @@
-function LF = SetParams()
+function LF = SetParams_server()
 
 addpath('image-morphing-master');
 addpath('PanoBasic-master');
