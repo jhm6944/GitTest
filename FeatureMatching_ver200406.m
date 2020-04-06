@@ -274,7 +274,8 @@ function MORPHED_IMAGE = renderingLF_morph(LF_A0, LF_A1, POS_X, POS_Y)%, Matched
         end
         
         rm_y_idx = [];
-        for y=2:size(features_temp)-1
+        y=2;
+        while (y ~= size(features_temp, 1) - 1)
             curr_y = features_temp(y, 2);
             if(y < height)
                 prev_y_idx = y - 1;
@@ -283,13 +284,15 @@ function MORPHED_IMAGE = renderingLF_morph(LF_A0, LF_A1, POS_X, POS_Y)%, Matched
             end
             prev_y = features_temp(prev_y_idx, 2);
             if(curr_y < prev_y)
-                rm_y_idx = cat(1, rm_y_idx, y);
+                features_temp(y, :) = [];
             elseif(curr_y == prev_y)
                 if(features_temp(y, 5) > features_temp(prev_y_idx, 5))
-                    rm_y_idx = cat(1, rm_y_idx, y);
+                    features_temp(y, :) = [];
                 else
-                    rm_y_idx = cat(1, rm_y_idx, prev_y_idx);
+                    features_temp(prev_y_idx, :) = [];
                 end
+            else
+                y = y + 1;
             end
         end
         features_temp(rm_y_idx, :) = [];
