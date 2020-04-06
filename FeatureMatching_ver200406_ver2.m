@@ -43,8 +43,8 @@ function MORPHED_IMAGE = renderingLF_morph(LF_A0, LF_A1, POS_X, POS_Y)%, Matched
         disp(['idx_w : ' num2str(idx_w) '/' num2str(size(ww, 2))]);
         tic; 
         w = ww(1, idx_w);
-        im_near = padarray(rgb2gray(view_near), [windowsize/2, windowsize/2], 0, 'both');
-        im_far = padarray(rgb2gray(view_far), [windowsize/2, windowsize/2], 0, 'both');
+        im_near = padarray(rgb2gray(view_near), [windowsize/2, windowsize/2], 'symmetric', 'both');
+        im_far = padarray(rgb2gray(view_far), [windowsize/2, windowsize/2], 'symmetric', 'both');
         
         im_far_subs  = zeros(windowsize+1, windowsize+1, size(hh, 2), 'uint8');
         for idx_h=1:size(hh, 2)
@@ -54,7 +54,8 @@ function MORPHED_IMAGE = renderingLF_morph(LF_A0, LF_A1, POS_X, POS_Y)%, Matched
 
            im_far_sub = im_far((h_n-25):(h_n+25), (w_n-25):(w_n+25));
            im_far_subs(:, :, idx_h) = im_far_sub;
-%            disp(num2str(idx_h));
+           
+%            disp(num2str(std(double(im_far_sub(:)))));
 %            imshow(imresize(im_far_sub, [150, 150]));
 %            pause;
         end
@@ -178,7 +179,9 @@ function MORPHED_IMAGE = renderingLF_morph(LF_A0, LF_A1, POS_X, POS_Y)%, Matched
                 w_far = OUT_W - w +1;
             end
             
-            features_temp = cat(1, features_temp, [w_near, h_n, w_far, h, cost(y, x)]);
+            if(cost(y, x) < 200)
+                features_temp = cat(1, features_temp, [w_near, h_n, w_far, h, cost(y, x)]);
+            end
         end
         
         y=2;
@@ -264,14 +267,6 @@ VIEW_BACK_NEAR_2 = im2uint8(inter8_mat(LF_A0, 0, P_near-1, 0, 0, U_BACK-1, 0, 0,
 VIEW_BACK_NEAR_1 = im2uint8(inter8_mat(LF_A0, 0, P_near-1, 0, 0, U_BACK-1, 0, 0, H-1, 0, 3));
 VIEW_BACK_NEAR = cat(3, VIEW_BACK_NEAR_1, VIEW_BACK_NEAR_2, VIEW_BACK_NEAR_3);
 
-%     view_near = cat(1, rot90(VIEW_BACK_NEAR(1:size(VIEW_BACK_NEAR, 1)/2, :, :), 2), ...
-%         VIEW_FRONT_NEAR, rot90(VIEW_BACK_NEAR((size(VIEW_BACK_NEAR, 1)/2 + 1):size(VIEW_BACK_NEAR, 1), :, :), 2));
-
-view_near = zeros(PARAMS.RESIZE_HEIGHT, PARAMS.RESIZE_WIDTH, 3, 'uint8');
-view_near(:, (PARAMS.RESIZE_WIDTH/2 - PARAMS.RESIZE_WIDTH/8 + 1):(PARAMS.RESIZE_WIDTH/2 + PARAMS.RESIZE_WIDTH/8), :) = VIEW_FRONT_NEAR;
-view_near(:, 1:PARAMS.RESIZE_WIDTH/8, :) = VIEW_BACK_NEAR(:, (size(VIEW_BACK_NEAR, 2)/2 + 1):size(VIEW_BACK_NEAR, 2), :);
-view_near(:, (PARAMS.RESIZE_WIDTH - PARAMS.RESIZE_WIDTH/8 + 1):PARAMS.RESIZE_WIDTH, :) = VIEW_BACK_NEAR(:, 1:size(VIEW_BACK_NEAR, 2)/2, :);
-
 VIEW_FRONT_FAR_3 = im2uint8(inter8_mat(LF_A1, 0, P_far-1, 0, 0, U_FRONT-1, 0, 0, H-1, 0, 1));
 VIEW_FRONT_FAR_2 = im2uint8(inter8_mat(LF_A1, 0, P_far-1, 0, 0, U_FRONT-1, 0, 0, H-1, 0, 2));
 VIEW_FRONT_FAR_1 = im2uint8(inter8_mat(LF_A1, 0, P_far-1, 0, 0, U_FRONT-1, 0, 0, H-1, 0, 3));
@@ -328,6 +323,11 @@ hog_cost = sum(sum(hog_cost));
 cost_i = intensity_cost;
 cost_g = gradient_cost;
 cost_f = hog_cost;
+
+std_im_far_sub = std(double(im_far_sub(:)));
+if(std_im_far_sub < 10)
+    cost_i = 9999;
+end
 
 % disp(['cost : ' num2str(cost_i) ', ' num2str(cost_f) ', ' num2str(cost_i + 250 * cost_f)]);
 % disp(['std  : ' num2str(std(double(im_near_sub(:)))) ', ' num2str(std(double(im_far_sub(:))))]);
