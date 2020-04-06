@@ -87,9 +87,11 @@ for x=1:size(disparity, 2)
         h = hh(1, y);
         
         if(h < height)
-            h_n = hh(1, y - (disparity(y, x) - 1));
+            h_n = h - (disparity(y, x) - 1);
+%             h_n = hh(1, y - (disparity(y, x) - 1));
         elseif(h > height)
-            h_n = hh(1, y + (disparity(y, x) - 1));
+            h_n = h + (disparity(y, x) - 1);
+%             h_n = hh(1, y + (disparity(y, x) - 1));            
         else
             h_n = h;
         end
@@ -112,27 +114,27 @@ for x=1:size(disparity, 2)
         features_temp = cat(1, features_temp, [w_near, h_n, w_far, h, cost(y, x)]);
     end
     
-    y=2;
-    while (y ~= size(features_temp, 1) - 1)
-        curr_y = features_temp(y, 2);
-        if(y < height)
-            prev_y_idx = y - 1;
-        elseif(y > height)
-            prev_y_idx = y + 1;
-        end
-        prev_y = features_temp(prev_y_idx, 2);
-        if(curr_y < prev_y)
-            features_temp(y, :) = [];
-        elseif(curr_y == prev_y)
-            if(features_temp(y, 5) > features_temp(prev_y_idx, 5))
-                features_temp(y, :) = [];
-            else
-                features_temp(prev_y_idx, :) = [];
-            end
-        else
-            y = y + 1;
-        end
-    end
+%     y=2;
+%     while (y ~= size(features_temp, 1) - 1)
+%         curr_y = features_temp(y, 2);
+%         if(y < height)
+%             prev_y_idx = y - 1;
+%         elseif(y > height)
+%             prev_y_idx = y + 1;
+%         end
+%         prev_y = features_temp(prev_y_idx, 2);
+%         if(curr_y < prev_y)
+%             features_temp(y, :) = [];
+%         elseif(curr_y == prev_y)
+%             if(features_temp(y, 5) > features_temp(prev_y_idx, 5))
+%                 features_temp(y, :) = [];
+%             else
+%                 features_temp(prev_y_idx, :) = [];
+%             end
+%         else
+%             y = y + 1;
+%         end
+%     end
     features = cat(1, features, features_temp);
 end
 

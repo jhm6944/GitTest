@@ -127,7 +127,7 @@ function MORPHED_IMAGE = renderingLF_morph(LF_A0, LF_A1, POS_X, POS_Y)%, Matched
         %% Extract Near images
         im_near_subs = zeros(windowsize, windowsize, 2*height);
         parfor idx_h=1:2*height
-            h = hh(1, idx_h) - height/2;
+            h = idx_h - height/2;
             w_n = U;
             rot = 0;
             if(h < 1)
@@ -181,7 +181,7 @@ function MORPHED_IMAGE = renderingLF_morph(LF_A0, LF_A1, POS_X, POS_Y)%, Matched
             elseif(farY > height)
                 cost_buff = zeros(bound, 3);
                 count = 0;
-                for idx_h_near = farY:min(farY + bound, height)
+                for idx_h_near = farY:min(farY + bound, 2*height)
                     count = count + 1;
                     [cost_i, cost_g, cost_f] = CalculateCost(idx_h_near, idx_h_far, im_near_subs, im_far_subs, windowsize);
                     cost_buff(count, :) = [cost_i cost_g cost_f];
