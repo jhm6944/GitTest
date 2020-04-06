@@ -277,22 +277,24 @@ function MORPHED_IMAGE = renderingLF_morph(LF_A0, LF_A1, POS_X, POS_Y)%, Matched
         for y=2:size(feature_temp)-1
             curr_y = feature_temp(y, 2);
             if(y < height)
-                prev_y_idx = y - 1;
+                prev_y_idx = y=
+                prev_y = feature_temp(y - 1, 2);
+                cost_y =  feature_temp(y - 1, 5);
             elseif(y > height)
-                prev_y_idx = y + 1;
+                prev_y = feature_temp(y + 1, 2);
+                cost_y =  feature_temp(y - 1, 5);
             end
-            prev_y = feature_temp(prev_y_idx, 2);
+            
             if(curr_y < prev_y)
                 rm_y_idx = cat(1, rm_y_idx, y);
             elseif(curr_y == prev_y)
-                if(feature_temp(y, 5) > feature_temp(prev_y_idx, 5))
+                if(feature_temp(y, 5) > cost_y)
                     rm_y_idx = cat(1, rm_y_idx, y);
                 else
-                    rm_y_idx = cat(1, rm_y_idx, prev_y_idx);
+                    
                 end
             end
         end
-        feature_temp(rm_y_idx, :) = [];
 %         [C,ia,ic] = unique(features_temp(:, 1:2), 'rows');
 %         features = cat(1, features, features_temp(ia, :));
         features = cat(1, features, features_temp);
