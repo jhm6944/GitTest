@@ -1,4 +1,7 @@
-%% DEBUG FEATURES
+addpath('image-morphing-master');
+addpath('PanoBasic-master');
+add_path;
+
 global PARAMS;
 
 load('disparity');
@@ -97,4 +100,22 @@ for idx_w=1:size(ww, 2)
         imshow(im_far_sub);
         pause;
     end
+end
+
+function IMAGE = LoadFrame(LF, FRAME_NUM)
+    global PARAMS;
+    
+    [TX, TY] = meshgrid(1:PARAMS.RESIZE_WIDTH, 1:PARAMS.RESIZE_HEIGHT);
+    TX = TX(:);
+    TY = TY(:);
+    IMAGE = zeros(PARAMS.RESIZE_HEIGHT, PARAMS.RESIZE_WIDTH, 3, 'uint8');
+    IMAGE_TEMP = zeros(size(TX, 1), 3);
+
+    IMAGE_TEMP(:, 1) = LF((FRAME_NUM-1) * (PARAMS.RESIZE_HEIGHT * PARAMS.RESIZE_WIDTH * 3) + (TX - 1) * (PARAMS.RESIZE_HEIGHT * 3) + (TY - 1) * 3 + 3); 
+    IMAGE_TEMP(:, 2) = LF((FRAME_NUM-1) * (PARAMS.RESIZE_HEIGHT * PARAMS.RESIZE_WIDTH * 3) + (TX - 1) * (PARAMS.RESIZE_HEIGHT * 3) + (TY - 1) * 3 + 2);
+    IMAGE_TEMP(:, 3) = LF((FRAME_NUM-1) * (PARAMS.RESIZE_HEIGHT * PARAMS.RESIZE_WIDTH * 3) + (TX - 1) * (PARAMS.RESIZE_HEIGHT * 3) + (TY - 1) * 3 + 1);
+
+    IMAGE(:, :, 1) = reshape(IMAGE_TEMP(:, 1), [PARAMS.RESIZE_HEIGHT, PARAMS.RESIZE_WIDTH]);
+    IMAGE(:, :, 2) = reshape(IMAGE_TEMP(:, 2), [PARAMS.RESIZE_HEIGHT, PARAMS.RESIZE_WIDTH]);
+    IMAGE(:, :, 3) = reshape(IMAGE_TEMP(:, 3), [PARAMS.RESIZE_HEIGHT, PARAMS.RESIZE_WIDTH]);
 end
