@@ -1,4 +1,6 @@
 LF = SetParams();
+
+
 %% DEBUG FEATURES
 
 height = PARAMS.HEIGHT/4;
