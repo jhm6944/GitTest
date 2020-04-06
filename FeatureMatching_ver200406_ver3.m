@@ -1,40 +1,40 @@
-LF = SetParams();
-% LF = SetParams_server();
+LF = SetParams_full();
 %% Run (w blending)
-[posx, posy] = meshgrid(-24:12:24, -24:12:24);
+[posx, posy] = meshgrid(0, -24:12:24);
 posx = posx(:);
 posy = posy(:);
 
-% for idx = 1:size(posx, 1)
-%     curr_posx = posx(idx, 1); 
-%     curr_posy = posy(idx, 1);
-    curr_posx = 0;
-    curr_posy = 0;
-    posx_front = curr_posx;            posy_front = curr_posy;
-
-    morph_image = renderingLF_morph(LF{1, 1}, LF{2, 1}, posx_front, posy_front);
-%     imshow(morph_image);
-% end
+for idx = 1:size(posx, 1)
+    curr_posx = posx(idx, 1); 
+    curr_posy = posy(idx, 1);
+%     curr_posx = 0;
+%     curr_posy = 0;
+    posx_dir_0 = curr_posx;
+    posy_dir_0 = curr_posy;
+    [view_front_near, view_front_far, view_back_near, view_back_far] = GenImages(LF{1, 1}, LF{2, 1}, posx_dir_0, posy_dir_0, 0);
+    [view_near, view_far] = ConversionFormOfImage(view_front_near, view_front_far, view_back_near, view_back_far, 1);
+    morph_image_0 = renderingLF_morph(posx_dir_0, posy_dir_0, view_near, view_far, 50, 20);
+    
+    posx_dir_1 = -1 * curr_posy;
+    posy_dir_1 = curr_posx;
+    [view_front_near, view_front_far, view_back_near, view_back_far] = GenImages(LF{3, 1}, LF{4, 1}, posx_dir_1, posy_dir_1, 1);
+    [view_near, view_far] = ConversionFormOfImage(view_front_near, view_front_far, view_back_near, view_back_far, 1);
+    morph_image_1 = renderingLF_morph(posx_dir_1, posy_dir_1, view_near, view_far, 50, 20);
+end
 
 %% Functions
-function MORPHED_IMAGE = renderingLF_morph(LF_A0, LF_A1, POS_X, POS_Y)%, MatchedFeatures)
+function MORPHED_IMAGE = renderingLF_morph(posx, posy, view_near, view_far, windowsize, feature_term)
     global PARAMS;
     ANGLE_S = -1 * deg2rad(45);
     ANGLE_E = deg2rad(45);
 
-    [VIEW_FRONT_NEAR, VIEW_FRONT_FAR, VIEW_BACK_NEAR, VIEW_BACK_FAR] = GenImages(LF_A0, LF_A1, POS_X, POS_Y);
-    [view_near, view_far] = ConversionFormOfImage(VIEW_FRONT_NEAR, VIEW_FRONT_FAR, VIEW_BACK_NEAR, VIEW_BACK_FAR, 1);
-
     height = PARAMS.HEIGHT/4;
     width = PARAMS.WIDTH/4;
     
-    windowsize = 50;
-    fov_1 = pi()/12;
-
     OUT_W = floor((ANGLE_E - ANGLE_S) / deg2rad(360/width));
-    h_t = ((height*2)-1) / floor(height*2/20);
+    h_t = ((height*2)-1) / floor(height*2/feature_term);
     hh = 1:h_t:(height*2);
-    w_t = (OUT_W-1) / floor(OUT_W/20);
+    w_t = (OUT_W-1) / floor(OUT_W/feature_term);
     ww = 1:w_t:OUT_W;
     
     disparity = zeros(size(hh, 2), size(ww, 2));
@@ -72,7 +72,6 @@ function MORPHED_IMAGE = renderingLF_morph(LF_A0, LF_A1, POS_X, POS_Y)%, Matched
            im_near_subs(:, :, idx_h) = im_near_sub;
         end
        
-        
         %% Calculate cost
         disparityLine = zeros(size(hh, 2), 1);
         costLine = zeros(size(hh, 2), 1);
@@ -195,26 +194,15 @@ function MORPHED_IMAGE = renderingLF_morph(LF_A0, LF_A1, POS_X, POS_Y)%, Matched
         end
         features = cat(1, features, features_temp);
     end
-    
-    [view_near, view_far] = ConversionFormOfImage(VIEW_FRONT_NEAR, VIEW_FRONT_FAR, VIEW_BACK_NEAR, VIEW_BACK_FAR, 1);
-%     
-%     for i=1:size(features, 1)
-%         showMatchedFeatures(view_near, view_far, features(i, 1:2), features(i, 3:4));
-%         pause;
-%     end
-    
     showMatchedFeatures(view_near, view_far, features(:, 1:2), features(:, 3:4));
     %% Mophing images
-    ratio = (POS_Y + 25)/50;
+    ratio = (posy + 25)/50;
     pts_mean = (features(:, 1:2) + features(:, 3:4)) / 2;
     tri = delaunay(pts_mean);
-    
-    
     MORPHED_IMAGE = morph(view_near, view_far, features(:, 1:2), features(:, 3:4), tri, 1-ratio, 1-ratio);
-    figure; imshow(MORPHED_IMAGE);
 end
 
-function [VIEW_FRONT_NEAR, VIEW_FRONT_FAR, VIEW_BACK_NEAR, VIEW_BACK_FAR] = GenImages(LF_A0, LF_A1, POS_X, POS_Y)
+function [VIEW_FRONT_NEAR, VIEW_FRONT_FAR, VIEW_BACK_NEAR, VIEW_BACK_FAR] = GenImages(LF_A0, LF_A1, POS_X, POS_Y, dir)
 global PARAMS;
 LFU_W = PARAMS.LFU_W * 3;
 ANGLE_S = -1 * deg2rad(45);
@@ -233,6 +221,11 @@ P_far(P_near < 1) = 1;    P_far(P_near > LFU_W) = LFU_W;
 
 U_FRONT = ANGLE.*(180.0 / pi)*(1.0 / 180.0)*PARAMS.RESIZE_WIDTH / 2 + PARAMS.RESIZE_WIDTH / 2;
 U_BACK = U_FRONT + PARAMS.RESIZE_WIDTH/2;
+
+if(dir == 1)
+    U_FRONT = U_FRONT + PARAMS.RESIZE_WIDTH/4;
+    U_BACK = U_BACK + PARAMS.RESIZE_WIDTH/4;
+end
 
 U_FRONT = round(U_FRONT);
 U_BACK = round(U_BACK);

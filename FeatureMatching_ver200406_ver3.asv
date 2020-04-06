@@ -1,23 +1,29 @@
-% LF = SetParams();
-LF = SetParams_server();
+LF = SetParams();
+% LF = SetParams_server();
 %% Run (w blending)
 [posx, posy] = meshgrid(-24:12:24, -24:12:24);
 posx = posx(:);
 posy = posy(:);
 
-% for idx = 1:size(posx, 1)
-%     curr_posx = posx(idx, 1); 
-%     curr_posy = posy(idx, 1);
-    curr_posx = 0;
-    curr_posy = 0;
-    posx_front = curr_posx;            posy_front = curr_posy;
-
-    morph_image = renderingLF_morph(LF{1, 1}, LF{2, 1}, posx_front, posy_front);
-    imshow(morph_image);
-% end
+for idx = 1:size(posx, 1)
+    curr_posx = posx(idx, 1); 
+    curr_posy = posy(idx, 1);
+%     curr_posx = 0;
+%     curr_posy = 0;
+    posx_dir_0 = curr_posx;
+    posy_dir_0 = curr_posy;
+    posx_dir_1 = -1 * curr_posy;
+    posy_dir_1 = curr_posx;
+    
+    
+    
+    morph_image_0 = renderingLF_morph(LF{1, 1}, LF{2, 1}, posx_dir_0, posy_dir_0, 0);
+    morph_image_1 = renderingLF_morph(LF{1, 1}, LF{2, 1}, posx_dir_0, posy_dir_0, 1);
+%     imshow(morph_image);
+end
 
 %% Functions
-function MORPHED_IMAGE = renderingLF_morph(LF_A0, LF_A1, POS_X, POS_Y)%, MatchedFeatures)
+function MORPHED_IMAGE = renderingLF_morph(LF_A0, LF_A1, POS_X, POS_Y, dir)
     global PARAMS;
     ANGLE_S = -1 * deg2rad(45);
     ANGLE_E = deg2rad(45);
@@ -68,7 +74,7 @@ function MORPHED_IMAGE = renderingLF_morph(LF_A0, LF_A1, POS_X, POS_Y)%, Matched
             w_n = round(w) + windowsize/2;
             h_n = round(h) + windowsize/2;
             
-           im_near_sub = im_near((h_n-windowsize/2):(h_n+25), (w_n-25):(w_n+25));
+           im_near_sub = im_near((h_n-windowsize/2):(h_n+windowsize/2), (w_n-windowsize/2):(w_n+windowsize/2));
            im_near_subs(:, :, idx_h) = im_near_sub;
         end
        
@@ -118,14 +124,12 @@ function MORPHED_IMAGE = renderingLF_morph(LF_A0, LF_A1, POS_X, POS_Y)%, Matched
         end
          toc;
         %%
-        
+%         
 %         for idx_h_far=1:size(hh, 2)
 %             farY = round(hh(1, idx_h_far));
 %             
 %             c = costLine(idx_h_far, 1);
 %             loc = disparityLine(idx_h_far, 1) - 1;
-%             disp(['h_idx : ' num2str(idx_h_far) ', ' num2str(loc) ', ' num2str(c)]);
-%             disp(['std  : ' num2str(std(double(im_near_sub(:)))) ', ' num2str(std(double(im_far_sub(:))))]);
 %             
 %             if(farY < height)
 %                 im_near_sub = im_near_subs(:, :, farY - loc);
@@ -134,6 +138,10 @@ function MORPHED_IMAGE = renderingLF_morph(LF_A0, LF_A1, POS_X, POS_Y)%, Matched
 %                 im_near_sub = im_near_subs(:, :, farY + loc);
 %                 im_far_sub = im_far_subs(:, :, idx_h_far);
 %             end
+%             
+%             disp(['h_idx : ' num2str(idx_h_far) ', ' num2str(loc) ', ' num2str(c)]);
+%             disp(['std  : ' num2str(std(double(im_near_sub(:)))) ', ' num2str(std(double(im_far_sub(:))))]);
+%             
 %             subplot(1, 2, 1);
 %             imshow(im_near_sub);
 %             subplot(1, 2, 2);
@@ -165,23 +173,8 @@ function MORPHED_IMAGE = renderingLF_morph(LF_A0, LF_A1, POS_X, POS_Y)%, Matched
                 h_n = h;
             end
             
-            h_near = h_n - height/2;
-            h_far = h - height/2;
-            
-            if(h_near < 1)
-                w_near = OUT_W - w +1;
-            elseif(h_near > height)
-                w_near = OUT_W - w +1;
-            end
-            
-            if(h_far < 1)
-                w_far = OUT_W - w +1;
-            elseif(h_far > height)
-                w_far = OUT_W - w +1;
-            end
-            
             if(cost(y, x) < 200)
-                features_temp = cat(1, features_temp, [w_near, h_n, w_far, h, cost(y, x)]);
+                features_temp = cat(1, features_temp, [w, h_n, w, h, cost(y, x)]);
             end
         end
         
@@ -216,17 +209,18 @@ function MORPHED_IMAGE = renderingLF_morph(LF_A0, LF_A1, POS_X, POS_Y)%, Matched
 %         pause;
 %     end
     
-%     showMatchedFeatures(view_near, view_far, features(:, 1:2), features(:, 3:4));
+    showMatchedFeatures(view_near, view_far, features(:, 1:2), features(:, 3:4));
     %% Mophing images
-    ratio = (POS_Y + 50)/100;
+    ratio = (POS_Y + 25)/50;
     pts_mean = (features(:, 1:2) + features(:, 3:4)) / 2;
     tri = delaunay(pts_mean);
     
     
     MORPHED_IMAGE = morph(view_near, view_far, features(:, 1:2), features(:, 3:4), tri, 1-ratio, 1-ratio);
+    figure; imshow(MORPHED_IMAGE);
 end
 
-function [VIEW_FRONT_NEAR, VIEW_FRONT_FAR, VIEW_BACK_NEAR, VIEW_BACK_FAR] = GenImages(LF_A0, LF_A1, POS_X, POS_Y)
+function [VIEW_FRONT_NEAR, VIEW_FRONT_FAR, VIEW_BACK_NEAR, VIEW_BACK_FAR] = GenImages(LF_A0, LF_A1, POS_X, POS_Y, dir)
 global PARAMS;
 LFU_W = PARAMS.LFU_W * 3;
 ANGLE_S = -1 * deg2rad(45);
@@ -245,6 +239,11 @@ P_far(P_near < 1) = 1;    P_far(P_near > LFU_W) = LFU_W;
 
 U_FRONT = ANGLE.*(180.0 / pi)*(1.0 / 180.0)*PARAMS.RESIZE_WIDTH / 2 + PARAMS.RESIZE_WIDTH / 2;
 U_BACK = U_FRONT + PARAMS.RESIZE_WIDTH/2;
+
+if(dir == 1)
+    U_FRONT = U_FRONT + PARAMS.RESIZE_WIDTH/4;
+    U_BACK = U_BACK + PARAMS.RESIZE_WIDTH/4;
+end
 
 U_FRONT = round(U_FRONT);
 U_BACK = round(U_BACK);
