@@ -303,7 +303,7 @@ function MORPHED_IMAGE = renderingLF_morph(LF_A0, LF_A1, POS_X, POS_Y)%, Matched
 
     ratio = (POS_Y + 50)/100;
     pts_mean = (features(:, 1:2) + features(:, 3:4)) / 2;
-    tri = delaunay(pts_mean_new);
+    tri = delaunay(pts_mean);
     MORPHED_IMAGE = morph(view_near, view_far, features(:, 1:2), features(:, 3:4), tri, 1-ratio, 1-ratio);
 end
 
