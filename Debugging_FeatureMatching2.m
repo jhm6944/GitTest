@@ -104,10 +104,10 @@ view_near = padarray(view_near, [25, 25], 0, 'both');
 view_far = padarray(view_far, [25, 25], 0, 'both');
 
 for i=1:size(features, 1)
-    w_n = features(i, 1);
-    h_n = features(i, 2);
-    w_f = features(i, 3);
-    h_f = features(i, 4);
+    w_n = features(i, 1) + 25;
+    h_n = features(i, 2) + 25;
+    w_f = features(i, 3) + 25;
+    h_f = features(i, 4) + 25;
     
     view_near_sub = view_near((h_n-20):(h_n+20), (w_n-20):(w_n+20), :);
     view_far_sub = view_far((h_f-20):(h_f+20), (w_f-20):(w_f+20), :);
