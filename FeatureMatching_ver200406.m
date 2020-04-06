@@ -102,144 +102,144 @@ function MORPHED_IMAGE = renderingLF_morph(LF_A0, LF_A1, POS_X, POS_Y)%, Matched
     disparity = zeros(size(hh, 2), size(ww, 2));
     cost = zeros(size(hh, 2), size(ww, 2));
     
-    for idx_w=1:size(ww, 2)
-        disp(['idx_w : ' num2str(idx_w) '/' num2str(size(ww, 2))]);
-        tic; 
-        w = ww(1, idx_w);
-        angle = ANGLE_S + deg2rad(360/width) .* (w-1);
-        U = angle * (180.0 / pi)*(1.0 / 180.0)*width / 2 + width / 2;
-        U = round(U);
-        
-        im_near = rgb2gray(view_near);
-        im_far  = rgb2gray(view_far);
-        
-        im_near_subs_1 = zeros(windowsize, windowsize, size(hh, 2));
-        im_far_subs_1  = zeros(windowsize, windowsize, size(hh, 2));
-        im_near_subs_2 = zeros(windowsize, windowsize, size(hh, 2));
-        im_far_subs_2  = zeros(windowsize, windowsize, size(hh, 2));
-        
-        disparityLine = zeros(size(hh, 2), 1);
-        costLine = zeros(size(hh, 2), 1);
-        for idx_h=1:size(hh, 2)
-            h = hh(1, idx_h) - height/2;
-            w_n = U;
-            rot = 0;
-            if(h < 1)
-                h = -1 * h;
-                w_n = U + width/2;
-                rot = 1;
-            elseif(h > height)
-                h = 2 * height - h;
-                w_n = U + width/2;
-                rot = 1;
-            end
-            
-            if(w_n > width)
-                w_n = w_n - width;
-            end
-            
-            lon = (w_n/(width/2) - 1) * pi();
-            lat = -1*(h/(height/2) - 1) * pi()/2;
-
-%             disp([num2str(lon) ', ' num2str(lat)]);
-            im_near_sub = imgLookAt(im2double(im_near), lon, lat, windowsize, fov_1);
-            im_near_sub(isnan(im_near_sub)) = 0;
-            im_near_sub_2 = imgLookAt(im2double(im_near), lon, lat, windowsize, fov_2);
-            im_near_sub_2(isnan(im_near_sub_2)) = 0;
-            if(rot == 1)
-                im_near_sub = rot90(im_near_sub, 2);
-                im_near_sub_2 = rot90(im_near_sub_2, 2);
-            end
-            im_near_subs_1(:, :, idx_h) = im_near_sub;
-            im_near_subs_2(:, :, idx_h) = im_near_sub_2;
-            
-            im_far_sub = imgLookAt(im2double(im_far), lon, lat, windowsize, fov_1);
-            im_far_sub(isnan(im_far_sub)) = 0;
-            im_far_sub_2 = imgLookAt(im2double(im_far), lon, lat, windowsize, fov_2);
-            im_far_sub_2(isnan(im_far_sub_2)) = 0;
-            if(rot == 1)
-                im_far_sub = rot90(im_far_sub, 2);
-                im_far_sub_2 = rot90(im_far_sub_2, 2);
-            end
-            im_far_subs_1(:, :, idx_h) = im_far_sub;
-            im_far_subs_2(:, :, idx_h) = im_far_sub_2;
-%             im_near_sub = im_near((h-50:h+50), (w_n-50):(w_n+50));
-%             im_far_sub = im_far((h-50:h+50), (w_n-50):(w_n+50));
-            
-%             disp(num2str(idx_h));
-%             subplot(1, 2, 1);
-%             imshow(im_near_sub);
-%             subplot(1, 2, 2);
-%             imshow(im_far_sub);
-%             pause;
-        end
-
-        bound = 10;
-%         bound_sub = 2;
-        for idx_h_far=1:size(hh, 2)
-            farY = hh(1, idx_h_far);
-            
-            if(idx_h_far >= 90 && idx_h_far <= 104)
-                disparityLine(idx_h_far, 1) = 1;
-                costLine(idx_h_far, 1) = -1;
-            elseif(farY < height)
-                cost_buff = zeros(bound, 3);
-                count = 0;
-                for idx_h_near=idx_h_far:-1:max(idx_h_far - bound, 1)
-                    count = count + 1;
-                    [cost_i, cost_g, cost_f] = CalculateCost(idx_h_near, idx_h_far, im_near_subs_1, im_far_subs_1, windowsize);
-                    cost_buff(count, :) = [cost_i cost_g cost_f];
-                end
-                cost_t = cost_buff(1:count, :);
-                cost_t2 = cost_t(:, 1) + cost_t(:, 2) / 15 + 250 * cost_t(:, 3);
-                [val, loc] = min(cost_t2);
+%     for idx_w=1:size(ww, 2)
+%         disp(['idx_w : ' num2str(idx_w) '/' num2str(size(ww, 2))]);
+%         tic; 
+%         w = ww(1, idx_w);
+%         angle = ANGLE_S + deg2rad(360/width) .* (w-1);
+%         U = angle * (180.0 / pi)*(1.0 / 180.0)*width / 2 + width / 2;
+%         U = round(U);
+%         
+%         im_near = rgb2gray(view_near);
+%         im_far  = rgb2gray(view_far);
+%         
+%         im_near_subs_1 = zeros(windowsize, windowsize, size(hh, 2));
+%         im_far_subs_1  = zeros(windowsize, windowsize, size(hh, 2));
+%         im_near_subs_2 = zeros(windowsize, windowsize, size(hh, 2));
+%         im_far_subs_2  = zeros(windowsize, windowsize, size(hh, 2));
+%         
+%         disparityLine = zeros(size(hh, 2), 1);
+%         costLine = zeros(size(hh, 2), 1);
+%         for idx_h=1:size(hh, 2)
+%             h = hh(1, idx_h) - height/2;
+%             w_n = U;
+%             rot = 0;
+%             if(h < 1)
+%                 h = -1 * h;
+%                 w_n = U + width/2;
+%                 rot = 1;
+%             elseif(h > height)
+%                 h = 2 * height - h;
+%                 w_n = U + width/2;
+%                 rot = 1;
+%             end
+%             
+%             if(w_n > width)
+%                 w_n = w_n - width;
+%             end
+%             
+%             lon = (w_n/(width/2) - 1) * pi();
+%             lat = -1*(h/(height/2) - 1) * pi()/2;
+% 
+% %             disp([num2str(lon) ', ' num2str(lat)]);
+%             im_near_sub = imgLookAt(im2double(im_near), lon, lat, windowsize, fov_1);
+%             im_near_sub(isnan(im_near_sub)) = 0;
+%             im_near_sub_2 = imgLookAt(im2double(im_near), lon, lat, windowsize, fov_2);
+%             im_near_sub_2(isnan(im_near_sub_2)) = 0;
+%             if(rot == 1)
+%                 im_near_sub = rot90(im_near_sub, 2);
+%                 im_near_sub_2 = rot90(im_near_sub_2, 2);
+%             end
+%             im_near_subs_1(:, :, idx_h) = im_near_sub;
+%             im_near_subs_2(:, :, idx_h) = im_near_sub_2;
+%             
+%             im_far_sub = imgLookAt(im2double(im_far), lon, lat, windowsize, fov_1);
+%             im_far_sub(isnan(im_far_sub)) = 0;
+%             im_far_sub_2 = imgLookAt(im2double(im_far), lon, lat, windowsize, fov_2);
+%             im_far_sub_2(isnan(im_far_sub_2)) = 0;
+%             if(rot == 1)
+%                 im_far_sub = rot90(im_far_sub, 2);
+%                 im_far_sub_2 = rot90(im_far_sub_2, 2);
+%             end
+%             im_far_subs_1(:, :, idx_h) = im_far_sub;
+%             im_far_subs_2(:, :, idx_h) = im_far_sub_2;
+% %             im_near_sub = im_near((h-50:h+50), (w_n-50):(w_n+50));
+% %             im_far_sub = im_far((h-50:h+50), (w_n-50):(w_n+50));
+%             
+% %             disp(num2str(idx_h));
+% %             subplot(1, 2, 1);
+% %             imshow(im_near_sub);
+% %             subplot(1, 2, 2);
+% %             imshow(im_far_sub);
+% %             pause;
+%         end
+% 
+%         bound = 10;
+% %         bound_sub = 2;
+%         for idx_h_far=1:size(hh, 2)
+%             farY = hh(1, idx_h_far);
+%             
+%             if(idx_h_far >= 90 && idx_h_far <= 104)
+%                 disparityLine(idx_h_far, 1) = 1;
+%                 costLine(idx_h_far, 1) = -1;
+%             elseif(farY < height)
 %                 cost_buff = zeros(bound, 3);
 %                 count = 0;
-%                 for idx_h_near = max(loc - bound_sub, 1):min(loc + bound_sub, bound)
+%                 for idx_h_near=idx_h_far:-1:max(idx_h_far - bound, 1)
 %                     count = count + 1;
-%                     [cost_i, cost_g, cost_f] = CalculateCost(idx_h_near, idx_h_far, im_near_subs_2, im_far_subs_2, windowsize);
+%                     [cost_i, cost_g, cost_f] = CalculateCost(idx_h_near, idx_h_far, im_near_subs_1, im_far_subs_1, windowsize);
 %                     cost_buff(count, :) = [cost_i cost_g cost_f];
 %                 end
 %                 cost_t = cost_buff(1:count, :);
 %                 cost_t2 = cost_t(:, 1) + cost_t(:, 2) / 15 + 250 * cost_t(:, 3);
 %                 [val, loc] = min(cost_t2);
-                disparityLine(idx_h_far, 1) = loc;
-                costLine(idx_h_far, 1) = val;
-            elseif(farY > height)
-                cost_buff = zeros(bound, 3);
-                count = 0;
-                for idx_h_near = idx_h_far:min(idx_h_far + bound, size(hh, 2))
-                    count = count + 1;
-                    [cost_i, cost_g, cost_f] = CalculateCost(idx_h_near, idx_h_far, im_near_subs_1, im_far_subs_1, windowsize);
-                    cost_buff(count, :) = [cost_i cost_g cost_f];
-                end
-                cost_t = cost_buff(1:count, :);
-                cost_t2 = cost_t(:, 1) + cost_t(:, 2) / 15 + 250 * cost_t(:, 3);
-                [val, loc] = min(cost_t2);
+% %                 cost_buff = zeros(bound, 3);
+% %                 count = 0;
+% %                 for idx_h_near = max(loc - bound_sub, 1):min(loc + bound_sub, bound)
+% %                     count = count + 1;
+% %                     [cost_i, cost_g, cost_f] = CalculateCost(idx_h_near, idx_h_far, im_near_subs_2, im_far_subs_2, windowsize);
+% %                     cost_buff(count, :) = [cost_i cost_g cost_f];
+% %                 end
+% %                 cost_t = cost_buff(1:count, :);
+% %                 cost_t2 = cost_t(:, 1) + cost_t(:, 2) / 15 + 250 * cost_t(:, 3);
+% %                 [val, loc] = min(cost_t2);
+%                 disparityLine(idx_h_far, 1) = loc;
+%                 costLine(idx_h_far, 1) = val;
+%             elseif(farY > height)
 %                 cost_buff = zeros(bound, 3);
 %                 count = 0;
-%                 for idx_h_near = max(loc - bound_sub, 1):min(loc + bound_sub, bound)
+%                 for idx_h_near = idx_h_far:min(idx_h_far + bound, size(hh, 2))
 %                     count = count + 1;
-%                     [cost_i, cost_g, cost_f] = CalculateCost(idx_h_near, idx_h_far, im_near_subs_2, im_far_subs_2, windowsize);
-%                     cost_buff(count, :) = [cost_i cost_g cost_f];   
+%                     [cost_i, cost_g, cost_f] = CalculateCost(idx_h_near, idx_h_far, im_near_subs_1, im_far_subs_1, windowsize);
+%                     cost_buff(count, :) = [cost_i cost_g cost_f];
 %                 end
 %                 cost_t = cost_buff(1:count, :);
 %                 cost_t2 = cost_t(:, 1) + cost_t(:, 2) / 15 + 250 * cost_t(:, 3);
 %                 [val, loc] = min(cost_t2);
-                disparityLine(idx_h_far, 1) = loc;
-                costLine(idx_h_far, 1) = val;
-            else
-                disparityLine(idx_h_far, 1) = 1;
-                costLine(idx_h_far, 1) = -1;
-            end
-        end
-        toc;
-        disparity(:, idx_w) = disparityLine;
-        cost(:, idx_w) = costLine;
-    end
+% %                 cost_buff = zeros(bound, 3);
+% %                 count = 0;
+% %                 for idx_h_near = max(loc - bound_sub, 1):min(loc + bound_sub, bound)
+% %                     count = count + 1;
+% %                     [cost_i, cost_g, cost_f] = CalculateCost(idx_h_near, idx_h_far, im_near_subs_2, im_far_subs_2, windowsize);
+% %                     cost_buff(count, :) = [cost_i cost_g cost_f];   
+% %                 end
+% %                 cost_t = cost_buff(1:count, :);
+% %                 cost_t2 = cost_t(:, 1) + cost_t(:, 2) / 15 + 250 * cost_t(:, 3);
+% %                 [val, loc] = min(cost_t2);
+%                 disparityLine(idx_h_far, 1) = loc;
+%                 costLine(idx_h_far, 1) = val;
+%             else
+%                 disparityLine(idx_h_far, 1) = 1;
+%                 costLine(idx_h_far, 1) = -1;
+%             end
+%         end
+%         toc;
+%         disparity(:, idx_w) = disparityLine;
+%         cost(:, idx_w) = costLine;
+%     end
     
-%     load('disparity');
-%     load('cost');
+    load('disparity');
+    load('cost');
     features = zeros(0, 5);
     for x=1:size(disparity, 2)    
         features_temp = zeros(0, 5);
@@ -274,41 +274,32 @@ function MORPHED_IMAGE = renderingLF_morph(LF_A0, LF_A1, POS_X, POS_Y)%, Matched
         end
         
         rm_y_idx = [];
-        for y=2:size(feature_temp)-1
-            curr_y = feature_temp(y, 2);
+        for y=2:size(features_temp)-1
+            curr_y = features_temp(y, 2);
             if(y < height)
                 prev_y_idx = y - 1;
             elseif(y > height)
                 prev_y_idx = y + 1;
             end
-            prev_y = feature_temp(prev_y_idx, 2);
+            prev_y = features_temp(prev_y_idx, 2);
             if(curr_y < prev_y)
                 rm_y_idx = cat(1, rm_y_idx, y);
             elseif(curr_y == prev_y)
-                if(feature_temp(y, 5) > feature_temp(prev_y_idx, 5))
+                if(features_temp(y, 5) > features_temp(prev_y_idx, 5))
                     rm_y_idx = cat(1, rm_y_idx, y);
                 else
                     rm_y_idx = cat(1, rm_y_idx, prev_y_idx);
                 end
             end
         end
-        feature_temp(rm_y_idx, :) = [];
+        features_temp(rm_y_idx, :) = [];
 %         [C,ia,ic] = unique(features_temp(:, 1:2), 'rows');
 %         features = cat(1, features, features_temp(ia, :));
         features = cat(1, features, features_temp);
     end
-    
-
-
-
-
-
 
     ratio = (POS_Y + 50)/100;
-    
     pts_mean = (features(:, 1:2) + features(:, 3:4)) / 2;
-    [C,ia,ic] = unique(pts_mean, 'rows');
-    pts_mean_new = pts_mean(ia, :);
     tri = delaunay(pts_mean_new);
     MORPHED_IMAGE = morph(view_near, view_far, features(:, 1:2), features(:, 3:4), tri, 1-ratio, 1-ratio);
 end
