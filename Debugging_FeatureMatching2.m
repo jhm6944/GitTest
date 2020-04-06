@@ -94,7 +94,22 @@ for x=1:size(disparity, 2)
             h_n = h;
         end
         
-        features_temp = cat(1, features_temp, [w, h_n, w, h, cost(y, x)]);
+        h_near = h_n - height/2;
+        h_far = h - height/2;
+        
+        if(h_near < 1)
+            w_near = OUT_W - w +1;
+        elseif(h_near > height)
+            w_near = OUT_W - w +1;
+        end
+        
+        if(h_far < 1)
+            w_far = OUT_W - w +1;
+        elseif(h_far > height)
+            w_far = OUT_W - w +1;
+        end
+        
+        features_temp = cat(1, features_temp, [w_near, h_n, w_far, h, cost(y, x)]);
     end
     [C,ia,ic] = unique(features_temp(:, 1:2), 'rows');
     features = cat(1, features, features_temp(ia, :));
@@ -104,10 +119,10 @@ view_near = padarray(view_near, [25, 25], 0, 'both');
 view_far = padarray(view_far, [25, 25], 0, 'both');
 
 for i=1:size(features, 1)
-    w_n = features(i, 1) + 25;
-    h_n = features(i, 2) + 25;
-    w_f = features(i, 3) + 25;
-    h_f = features(i, 4) + 25;
+    w_n = round(features(i, 1)) + 25;
+    h_n = round(features(i, 2)) + 25;
+    w_f = round(features(i, 3)) + 25;
+    h_f = round(features(i, 4)) + 25;
     
     view_near_sub = view_near((h_n-20):(h_n+20), (w_n-20):(w_n+20), :);
     view_far_sub = view_far((h_f-20):(h_f+20), (w_f-20):(w_f+20), :);
