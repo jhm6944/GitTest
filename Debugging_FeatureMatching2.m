@@ -111,6 +111,28 @@ for x=1:size(disparity, 2)
         
         features_temp = cat(1, features_temp, [w_near, h_n, w_far, h, cost(y, x)]);
     end
+    
+    y=2;
+        while (y ~= size(features_temp, 1) - 1)
+            curr_y = features_temp(y, 2);
+            if(y < height)
+                prev_y_idx = y - 1;
+            elseif(y > height)
+                prev_y_idx = y + 1;
+            end
+            prev_y = features_temp(prev_y_idx, 2);
+            if(curr_y < prev_y)
+                features_temp(y, :) = [];
+            elseif(curr_y == prev_y)
+                if(features_temp(y, 5) > features_temp(prev_y_idx, 5))
+                    features_temp(y, :) = [];
+                else
+                    features_temp(prev_y_idx, :) = [];
+                end
+            else
+                y = y + 1;
+            end
+        end
 %     [C,ia,ic] = unique(features_temp(:, 1:2), 'rows');
 %     features = cat(1, features, features_temp(ia, :));
     features = cat(1, features, features_temp);
@@ -125,8 +147,8 @@ for i=1:size(features, 1)
     w_f = round(features(i, 3)) + 25;
     h_f = round(features(i, 4)) + 25;
     
-    view_near_sub = view_near((h_n-20):(h_n+20), (w_n-20):(w_n+20), :);
-    view_far_sub = view_far((h_f-20):(h_f+20), (w_f-20):(w_f+20), :);
+    view_near_sub = view_near((h_n-25):(h_n+25), (w_n-25):(w_n+25), :);
+    view_far_sub = view_far((h_f-25):(h_f+25), (w_f-25):(w_f+25), :);
     
     disp([num2str(w_n) ', ' num2str(h_n) ', ' num2str(w_f) ', ' num2str(h_f) ]);
     subplot(1, 2, 1);

@@ -273,7 +273,6 @@ function MORPHED_IMAGE = renderingLF_morph(LF_A0, LF_A1, POS_X, POS_Y)%, Matched
             features_temp = cat(1, features_temp, [w_near, h_n, w_far, h, cost(y, x)]);
         end
         
-        rm_y_idx = [];
         y=2;
         while (y ~= size(features_temp, 1) - 1)
             curr_y = features_temp(y, 2);
@@ -295,7 +294,6 @@ function MORPHED_IMAGE = renderingLF_morph(LF_A0, LF_A1, POS_X, POS_Y)%, Matched
                 y = y + 1;
             end
         end
-        features_temp(rm_y_idx, :) = [];
 %         [C,ia,ic] = unique(features_temp(:, 1:2), 'rows');
 %         features = cat(1, features, features_temp(ia, :));
         features = cat(1, features, features_temp);
