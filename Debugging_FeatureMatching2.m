@@ -180,14 +180,14 @@ for x=1:size(disparity, 2)
         prev_y = features_temp(prev_y_idx, 2);
         
         if(curr_y < prev_y)
-            disparity(x, y) = -1;
+            disparity(y, x) = -1;
 %             features_temp(y, :) = [];
         elseif(curr_y == prev_y)
             if(features_temp(y, 5) > features_temp(prev_y_idx, 5))
-                disparity(x, y) = -1;
+                disparity(y, x) = -1;
 %                 features_temp(y, :) = [];
             else
-                disparity(x, prev_y_idx) = -1;
+                disparity(prev_y_idx, x) = -1;
 %                 features_temp(prev_y_idx, :) = [];
             end
         end
