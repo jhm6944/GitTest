@@ -133,9 +133,6 @@ for x=1:size(disparity, 2)
             y = y + 1;
         end
     end
-    plot(features_temp(:,[2,4]))
-    %     [C,ia,ic] = unique(features_temp(:, 1:2), 'rows');
-    %     features = cat(1, features, features_temp(ia, :));
     features = cat(1, features, features_temp);
 end
 
