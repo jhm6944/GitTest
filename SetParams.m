@@ -20,21 +20,21 @@ TY = TY(:);
 
 LF = cell(2, 1);
 LF_FILE = cell(2, 1);
-% LF_FILE{1, 1} = ['Row7'; 'Row8'; 'Row9'];
-% LF_FILE{2, 1} = ['Row13'; 'Row14'; 'Row15'];
+LF_FILE{1, 1} = ['Row7'; 'Row8'; 'Row9'];
+LF_FILE{2, 1} = ['Row13'; 'Row14'; 'Row15'];
 
-LF_FILE{1, 1} = ['Row15'; 'Row16'; 'Row17'];
-LF_FILE{2, 1} = ['Row21'; 'Row22'; 'Row23'];
+% LF_FILE{1, 1} = ['Row15'; 'Row16'; 'Row17'];
+% LF_FILE{2, 1} = ['Row21'; 'Row22'; 'Row23'];
 
 for i=1:length(LF)
     LF{i, 1} = zeros(3*PARAMS.LFU_W * PARAMS.RESIZE_HEIGHT * PARAMS.RESIZE_WIDTH * 3, 1, 'uint8');
     for n=1:PARAMS.LFU_W*3
         if(n <= PARAMS.LFU_W)
-            file = sprintf('../Matlab_FeatureExtraction/BMW_5K/BMW_ALIGN/%s/%04d.jpg' , LF_FILE{i, 1}(1, :), n);
+            file = sprintf('E:/BMW_5K/BMW_ALIGN/%s/%04d.jpg' , LF_FILE{i, 1}(1, :), n);
         elseif(n <= PARAMS.LFU_W*2)
-            file = sprintf('../Matlab_FeatureExtraction/BMW_5K/BMW_ALIGN/%s/%04d.jpg' , LF_FILE{i, 1}(2, :), n - PARAMS.LFU_W);
+            file = sprintf('E:/BMW_5K/BMW_ALIGN/%s/%04d.jpg' , LF_FILE{i, 1}(2, :), n - PARAMS.LFU_W);
         else
-            file = sprintf('../Matlab_FeatureExtraction/BMW_5K/BMW_ALIGN/%s/%04d.jpg' , LF_FILE{i, 1}(3, :), n - PARAMS.LFU_W*2);
+            file = sprintf('E:/BMW_5K/BMW_ALIGN/%s/%04d.jpg' , LF_FILE{i, 1}(3, :), n - PARAMS.LFU_W*2);
         end
         img = imread(file);
         img = imresize(img, [PARAMS.RESIZE_HEIGHT, PARAMS.RESIZE_WIDTH]);
